@@ -1,0 +1,7 @@
+# Default owners for everything in this repo
+*                  @annyzapata @h4cky-5p1d3r
+
+# Changes to pipeline and security-sensitive modules need these owners
+/.github/          @annyzapata @h4cky-5p1d3r
+/modules/oidc-role/        @annyzapata @h4cky-5p1d3r
+/modules/iam-boundary/     @annyzapata @h4cky-5p1d3r
