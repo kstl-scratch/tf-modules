@@ -5,3 +5,8 @@
 /.github/          @annyzapata @h4cky-5p1d3r
 /modules/oidc-role/        @annyzapata @h4cky-5p1d3r
 /modules/iam-boundary/     @annyzapata @h4cky-5p1d3r
+
+# Security tooling config: defines which secret checks exist
+/.pre-commit-config.yaml   @kstl-scratch/security-reviewers
+/.gitleaks.toml            @kstl-scratch/security-reviewers
+/.gitleaksignore           @kstl-scratch/security-reviewers
