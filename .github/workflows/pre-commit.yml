@@ -1,0 +1,40 @@
+name: pre-commit
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions: {}
+
+jobs:
+  pre-commit:
+    name: pre-commit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Require full commit SHA pins for all actions
+        run: |
+          bad=$(grep -rnE '^[[:space:]]*-?[[:space:]]*uses:' .github/workflows \
+            | grep -vE 'uses:[[:space:]]*\./' \
+            | grep -vE '@[0-9a-f]{40}([[:space:]]|$)' || true)
+          if [ -n "$bad" ]; then
+            echo "Unpinned actions found:"
+            echo "$bad"
+            exit 1
+          fi
+
+      - name: Install pre-commit (pinned version)
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install --disable-pip-version-check pre-commit==4.6.2
+
+      - name: Run pre-commit on all files
+        run: .venv/bin/pre-commit run --all-files --show-diff-on-failure
