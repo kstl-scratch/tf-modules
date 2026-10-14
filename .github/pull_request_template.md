@@ -5,7 +5,7 @@ CM-
 <!-- One or two sentences: what does this PR do? -->
 
 ## Why
-<!-- The reason for the change. Link the change request issue, for example: Closes #12 -->
+<!-- The reason for the change. Reference the Jira change ticket, for example: CM-2 -->
 
 ## Risk
 <!-- What could go wrong, and who or what is affected? -->
