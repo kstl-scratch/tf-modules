@@ -63,10 +63,35 @@ jobs:
           echo "Scanning range: $range"
           "$RUNNER_TEMP/gitleaks-bin/gitleaks" git --log-opts="$range" --redact --verbose
 
-      - name: Install pre-commit (pinned version)
+      - name: Install pre-commit and Checkov (pinned versions)
         run: |
+          set -euo pipefail
           python3 -m venv .venv
-          .venv/bin/pip install --disable-pip-version-check pre-commit==4.6.2
+          .venv/bin/pip install --disable-pip-version-check pre-commit==4.6.2 checkov==3.3.10
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+
+      - name: Install Terraform and TFLint (pinned, checksum-verified)
+        env:
+          TERRAFORM_VERSION: 1.16.6
+          TERRAFORM_SHA256: 38034b38d03096399a7a1264a14561a8029b2b496fd1f169452656e53968f1b7
+          TFLINT_VERSION: 0.64.0
+          TFLINT_SHA256: cca9d13e2e1d7a2c627af60ff899a3c9b74212899416aeb96ec764d2ef954537
+        run: |
+          set -euo pipefail
+          BIN="$RUNNER_TEMP/tf-bin"
+          mkdir -p "$BIN"
+
+          curl -sSfL -o "$RUNNER_TEMP/terraform.zip" \
+            "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+          echo "${TERRAFORM_SHA256}  $RUNNER_TEMP/terraform.zip" | sha256sum -c -
+          unzip -q "$RUNNER_TEMP/terraform.zip" terraform -d "$BIN"
+
+          curl -sSfL -o "$RUNNER_TEMP/tflint.zip" \
+            "https://github.com/terraform-linters/tflint/releases/download/v${TFLINT_VERSION}/tflint_linux_amd64.zip"
+          echo "${TFLINT_SHA256}  $RUNNER_TEMP/tflint.zip" | sha256sum -c -
+          unzip -q "$RUNNER_TEMP/tflint.zip" tflint -d "$BIN"
+
+          echo "$BIN" >> "$GITHUB_PATH"
 
       - name: Run pre-commit on all files
-        run: .venv/bin/pre-commit run --all-files --show-diff-on-failure
+        run: pre-commit run --all-files --show-diff-on-failure
